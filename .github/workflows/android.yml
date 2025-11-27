@@ -1,33 +1,36 @@
 name: Android CI
 
-
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
-
 jobs:
   build:
-
-
     runs-on: ubuntu-latest
 
-
     steps:
-    - uses: actions/checkout@v4
-    - name: set up JDK 17
+    - name: Checkout source
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
 
-
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-      
+
+    # 只編譯 debug APK
     - name: Build Debug APK
       run: ./gradlew assembleDebug
 
+    # 將 APK 上傳到 artifacts
+    - name: Upload APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: debug-apk
+        path: app/build/outputs/apk/debug/*.apk
